@@ -195,7 +195,7 @@ class PDFProcessor:
                 self.log_message(f"Не удалось загрузить comm_types.json: {e}. Использую значения по умолчанию.")
                 self.reset_comm_types_to_defaults(save=False)
         else:
-            self.reset_comm_types_to_defaults(save=False)
+            self.reset_comm_types_to_defaults(save=True)
 
     def save_comm_types(self):
         try:
