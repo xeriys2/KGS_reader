@@ -140,6 +140,7 @@ class PDFProcessor:
         self.points_folder = ""
         self.debug_mode = False
         self.ignore_excel = False
+        self.tessdata_dir = ""
         self.sort_points_by_comm = False  # раскладывать каталоги по типам
 
         # Конфиг типов коммуникаций
@@ -283,7 +284,8 @@ class PDFProcessor:
                         pytesseract.pytesseract.tesseract_cmd = p
                         tessdata = os.path.join(os.path.dirname(p), "tessdata")
                         if os.path.isdir(tessdata):
-                            os.environ["TESSDATA_PREFIX"] = os.path.dirname(p)
+                            self.tessdata_dir = tessdata
+                            os.environ["TESSDATA_PREFIX"] = tessdata
                         break
             pytesseract.get_tesseract_version()
             self.log_message("Tesseract OCR: ок")
@@ -309,7 +311,12 @@ class PDFProcessor:
             pix = page.get_pixmap(matrix=matrix, dpi=300)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             img = self.enhance_image(img)
-            return pytesseract.image_to_string(img, config=r'--oem 3 --psm 3 -l rus+eng --dpi 300')
+            base_cfg = '--oem 3 --psm 3 -l rus+eng --dpi 300'
+            if self.tessdata_dir:
+                cfg = f'--tessdata-dir "{self.tessdata_dir}" {base_cfg}'
+            else:
+                cfg = base_cfg
+            return pytesseract.image_to_string(img, config=cfg)
         except Exception as e:
             self.log_message(f"OCR ошибка: {e}")
             return ""
