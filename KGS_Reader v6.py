@@ -269,7 +269,10 @@ class PDFProcessor:
             return
         try:
             if sys.platform == 'win32':
+                app_dir = get_app_dir()
                 paths = [
+                    os.path.join(app_dir, "tesseract", "tesseract.exe"),
+                    os.path.join(app_dir, "tesseract.exe"),
                     r'C:\Program Files\Tesseract-OCR\tesseract.exe',
                     r'C:\Program Files (x86)\Tesseract-OCR\tesseract.exe',
                     os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Tesseract-OCR', 'tesseract.exe'),
@@ -278,6 +281,9 @@ class PDFProcessor:
                 for p in paths:
                     if os.path.exists(p):
                         pytesseract.pytesseract.tesseract_cmd = p
+                        tessdata = os.path.join(os.path.dirname(p), "tessdata")
+                        if os.path.isdir(tessdata):
+                            os.environ["TESSDATA_PREFIX"] = os.path.dirname(p)
                         break
             pytesseract.get_tesseract_version()
             self.log_message("Tesseract OCR: ок")
