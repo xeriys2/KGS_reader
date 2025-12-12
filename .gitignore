@@ -4,6 +4,11 @@ __pycache__/
 *.log
 application_log.txt
 
+# Virtualenvs
+.venv*/
+venv*/
+env*/
+
 # Build artifacts
 build/
 dist/
@@ -21,6 +26,9 @@ DEBUG_FULL_OCR_*.txt
 # Old versions
 KGS_Reader v5.py
 KGS_Reader.py
+
+# Optional portable OCR bundle (keep local, don't commit)
+tesseract/
 
 # Local settings
 settings.json
