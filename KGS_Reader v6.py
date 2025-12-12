@@ -62,6 +62,13 @@ TELEGRAM_URL = "https://t.me/Pronin_m"
 # Ссылка на репозиторий (исходный код)
 REPO_URL = "https://github.com/xeriys2/KGS_reader"
 
+
+def get_app_dir():
+    if getattr(sys, "frozen", False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 class ProcessingCancelled(Exception):
     """Raised when user cancels processing."""
 
@@ -136,10 +143,7 @@ class PDFProcessor:
         self.sort_points_by_comm = False  # раскладывать каталоги по типам
 
         # Конфиг типов коммуникаций
-        self.comm_types_config_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "comm_types.json"
-        )
+        self.comm_types_config_path = os.path.join(get_app_dir(), "comm_types.json")
         self.default_comm_types = self._build_default_comm_types()
         self.comm_types = []  # список словарей: {"name": str, "enabled": bool}
         self.load_comm_types()
@@ -1214,7 +1218,6 @@ class App(ttk.Frame):
         super().__init__(master, padding=8)
         self.master = master
         self.master.title("КГС: обработчик PDF")
-        self.master.geometry("1200x750")
         self.master.minsize(1000, 650)
 
         style = ttk.Style()
@@ -1229,8 +1232,18 @@ class App(ttk.Frame):
         self.status_text = tk.StringVar(value="")
         self.var_sort_points = tk.BooleanVar(value=True)
 
+        self.var_import = tk.BooleanVar(value=False)
+        self.var_debug = tk.BooleanVar(value=False)
+        self.var_ignore_excel = tk.BooleanVar(value=False)
+        self.var_move = tk.BooleanVar(value=False)
+
         self.selection_info_text = tk.StringVar(value="Выбрано: 0/0")
         self._tooltips = []
+
+        self.settings_path = os.path.join(get_app_dir(), "settings.json")
+        self._load_settings()
+        if not self.master.winfo_geometry() or self.master.winfo_geometry() == "1x1+0+0":
+            self.master.geometry("1200x750")
 
         try:
             style.configure("Cancel.TButton", foreground="#b00020")
@@ -1257,6 +1270,15 @@ class App(ttk.Frame):
 
         self.processor = PDFProcessor(log_callback=self._append_log)
         self._update_selection_info()
+        self.master.protocol("WM_DELETE_WINDOW", self.on_close)
+
+        folder = self.folder_path.get().strip()
+        if folder and os.path.isdir(folder):
+            self.file_selector.load_files(folder)
+            if self.var_import.get() and not self.points_folder.get():
+                self.points_folder.set(folder)
+        self._toggle_points()
+        self._toggle_move()
 
     def _build_toolbar(self):
         bar = ttk.Frame(self)
@@ -1281,11 +1303,6 @@ class App(ttk.Frame):
 
         rec = ttk.LabelFrame(right, text="Распознавание")
         rec.pack(fill="x", pady=(0,8))
-
-        self.var_import = tk.BooleanVar(value=False)
-        self.var_debug = tk.BooleanVar(value=False)
-        self.var_ignore_excel = tk.BooleanVar(value=False)
-        self.var_move = tk.BooleanVar(value=False)
 
         cb_import = ttk.Checkbutton(rec, text="Импортировать координаты (TXT)", variable=self.var_import, command=self._toggle_points)
         cb_import.pack(anchor="w")
@@ -1476,11 +1493,13 @@ class App(ttk.Frame):
         self.btn_points.config(state=state)
         if self.var_import.get() and not self.points_folder.get() and self.folder_path.get():
             self.points_folder.set(self.folder_path.get())
+        self._save_settings()
 
     def _toggle_move(self):
         state = "normal" if self.var_move.get() else "disabled"
         self.entry_move.config(state=state)
         self.btn_move.config(state=state)
+        self._save_settings()
 
     def _update_selection_info(self):
         total = len(getattr(self.file_selector, "files_data", []) or [])
@@ -1499,11 +1518,13 @@ class App(ttk.Frame):
                 self.points_folder.set(path)
             self._append_log(f"Загружена папка: {path}")
             self._update_selection_info()
+            self._save_settings()
 
     def browse_points(self):
         path = filedialog.askdirectory()
         if path:
             self.points_folder.set(path)
+            self._save_settings()
 
     def browse_move(self):
         path = filedialog.askdirectory()
@@ -1512,6 +1533,54 @@ class App(ttk.Frame):
                 messagebox.showwarning("Перемещение", "Папка перемещения не может совпадать с исходной.")
                 return
             self.move_folder_path.set(path)
+            self._save_settings()
+
+    def _load_settings(self):
+        if not os.path.exists(self.settings_path):
+            return
+        try:
+            with open(self.settings_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            if not isinstance(data, dict):
+                return
+            self.folder_path.set(str(data.get("folder_path", "") or ""))
+            self.points_folder.set(str(data.get("points_folder", "") or ""))
+            self.move_folder_path.set(str(data.get("move_folder_path", "") or ""))
+            self.var_import.set(bool(data.get("var_import", False)))
+            self.var_sort_points.set(bool(data.get("var_sort_points", True)))
+            self.var_debug.set(bool(data.get("var_debug", False)))
+            self.var_ignore_excel.set(bool(data.get("var_ignore_excel", False)))
+            self.var_move.set(bool(data.get("var_move", False)))
+            geometry = str(data.get("window_geometry", "") or "").strip()
+            if geometry:
+                try:
+                    self.master.geometry(geometry)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    def _save_settings(self):
+        try:
+            data = {
+                "folder_path": self.folder_path.get().strip(),
+                "points_folder": self.points_folder.get().strip(),
+                "move_folder_path": self.move_folder_path.get().strip(),
+                "var_import": bool(self.var_import.get()),
+                "var_sort_points": bool(self.var_sort_points.get()),
+                "var_debug": bool(self.var_debug.get()),
+                "var_ignore_excel": bool(self.var_ignore_excel.get()),
+                "var_move": bool(self.var_move.get()),
+                "window_geometry": self.master.winfo_geometry(),
+            }
+            with open(self.settings_path, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    def on_close(self):
+        self._save_settings()
+        self.master.destroy()
 
     def open_comm_types_dialog(self):
         dlg = tk.Toplevel(self.master)
