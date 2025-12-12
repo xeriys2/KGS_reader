@@ -9,6 +9,10 @@ application_log.txt
 venv*/
 env*/
 
+# Local caches / release zips
+.cache/
+release/
+
 # Build artifacts
 build/
 dist/

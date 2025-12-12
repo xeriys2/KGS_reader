@@ -36,17 +36,26 @@ python "KGS_Reader v6.py"
 .\build_portable_light.ps1
 ```
 
+По умолчанию скрипт старается положить рядом portable-OCR (Tesseract + `rus/eng`). Если OCR не нужен:
+
+```powershell
+.\build_portable_light.ps1 -WithoutOcr
+```
+
 Альтернатива (если `pyinstaller` уже установлен в текущем окружении; может получиться “тяжёлая” сборка):
 
 ```powershell
 .\build_portable.ps1
 ```
 
-Выход: `dist\KGS_Reader\KGS_Reader.exe`.
+Выход:
+
+- Папка: `dist\KGS_Reader\` (копируйте/переносите целиком, не только `.exe`).
+- Архив: `release\KGS_Reader_portable.zip` (удобно раздавать “без заморочек”: распаковал и запустил).
 
 ### OCR в portable
 
-Если положить рядом папку `tesseract\` (например `tesseract\tesseract.exe` и `tesseract\tessdata\...`), приложение автоматически попытается использовать её.
+Если рядом есть папка `tesseract\` (например `tesseract\tesseract.exe` и `tesseract\tessdata\...`), приложение автоматически попытается использовать её.
 
 ## Лицензия
 
