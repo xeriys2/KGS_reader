@@ -59,6 +59,9 @@ except ImportError:
 # Ссылка на профиль в Telegram
 TELEGRAM_URL = "https://t.me/Pronin_m"
 
+# Ссылка на репозиторий (исходный код)
+REPO_URL = "https://github.com/xeriys2/KGS_reader"
+
 class ProcessingCancelled(Exception):
     """Raised when user cancels processing."""
 
@@ -1364,7 +1367,17 @@ class App(ttk.Frame):
 
         footer = ttk.Frame(bottom)
         footer.pack(fill="x", pady=(4,0))
-        # Ссылка TG в правом нижнем углу
+        # Ссылки TG и Repo в правом нижнем углу
+        self.repo_label = tk.Label(
+            footer,
+            text="Repo",
+            fg="#0088CC",
+            cursor="hand2",
+            font=("Segoe UI", 10, "underline"),
+        )
+        self.repo_label.pack(side="right", padx=(0, 8))
+        self.repo_label.bind("<Button-1>", self.open_repo)
+
         self.telegram_label = tk.Label(
             footer,
             text="TG",
@@ -1391,6 +1404,16 @@ class App(ttk.Frame):
             webbrowser.open(url)
         except Exception as e:
             messagebox.showerror("Telegram", f"Не удалось открыть ссылку: {e}")
+
+    def open_repo(self, event=None):
+        url = (REPO_URL or "").strip()
+        if not url or "github.com" not in url:
+            messagebox.showinfo("Repo", "Укажите ссылку на репозиторий в REPO_URL в коде.")
+            return
+        try:
+            webbrowser.open(url)
+        except Exception as e:
+            messagebox.showerror("Repo", f"Не удалось открыть ссылку: {e}")
 
     def _reset_progress_ui(self, total_files=0):
         self._progress_state = {
