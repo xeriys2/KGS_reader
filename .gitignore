@@ -1,0 +1,20 @@
+__pycache__/
+*.pyc
+*.pyo
+*.log
+application_log.txt
+
+# Build artifacts
+build/
+dist/
+*.spec
+
+# Data/output folders (may contain internal files)
+КГС/
+Координаты/
+*.pdf
+*.xlsx
+DEBUG_FULL_OCR_*.txt
+*_issues.txt
+проблемные_файлы.txt
+

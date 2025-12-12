@@ -1,0 +1,124 @@
+{
+  "types": [
+    {
+      "name": "Кабель связи",
+      "enabled": true
+    },
+    {
+      "name": "Тел канализация",
+      "enabled": true
+    },
+    {
+      "name": "Кабельная канализация",
+      "enabled": true
+    },
+    {
+      "name": "ВОЛС",
+      "enabled": true
+    },
+    {
+      "name": "КТВ",
+      "enabled": true
+    },
+    {
+      "name": "Эл кабель",
+      "enabled": true
+    },
+    {
+      "name": "Кабель техн. и очаг. заземл",
+      "enabled": true
+    },
+    {
+      "name": "Контур заземл",
+      "enabled": true
+    },
+    {
+      "name": "Кабель но",
+      "enabled": true
+    },
+    {
+      "name": "Водосток",
+      "enabled": true
+    },
+    {
+      "name": "Вод-д",
+      "enabled": true
+    },
+    {
+      "name": "Трубопровод",
+      "enabled": true
+    },
+    {
+      "name": "Канализация хоз-быт",
+      "enabled": true
+    },
+    {
+      "name": "ЛОС",
+      "enabled": true
+    },
+    {
+      "name": "Дренаж",
+      "enabled": true
+    },
+    {
+      "name": "Воздухопровод",
+      "enabled": true
+    },
+    {
+      "name": "Вент. ветки",
+      "enabled": true
+    },
+    {
+      "name": "Теплотрасса",
+      "enabled": true
+    },
+    {
+      "name": "Коллектор",
+      "enabled": true
+    },
+    {
+      "name": "Газопровод",
+      "enabled": true
+    },
+    {
+      "name": "Нефтепровод",
+      "enabled": true
+    },
+    {
+      "name": "Продуктопровод",
+      "enabled": true
+    },
+    {
+      "name": "СОУЭ",
+      "enabled": true
+    },
+    {
+      "name": "СКУД",
+      "enabled": true
+    },
+    {
+      "name": "Канализация",
+      "enabled": true
+    },
+    {
+      "name": "Нап канализация",
+      "enabled": true
+    },
+    {
+      "name": "Сам канализация",
+      "enabled": true
+    },
+    {
+      "name": "Водовыпуск",
+      "enabled": true
+    },
+    {
+      "name": "Кабель защ",
+      "enabled": true
+    },
+    {
+      "name": "Газ",
+      "enabled": true
+    }
+  ]
+}
