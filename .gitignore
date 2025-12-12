@@ -18,3 +18,5 @@ DEBUG_FULL_OCR_*.txt
 *_issues.txt
 проблемные_файлы.txt
 
+# Old versions
+KGS_Reader v5.py
